@@ -3,38 +3,35 @@ const express = require("express"),
   db = require("oracledb"),
   router = express.Router();
 
-router.get("/", function (req, res) {
-  let arrStr;
-  db.getConnection(
-    {
+db.autoCommit = true;
+router.post("/insertHRCode", run);
+
+async function run(req, res) {
+  console.log("post");
+  let connection;
+  try {
+    connection = await db.getConnection({
       user: dbConfig.user,
       password: dbConfig.password,
       connectString: dbConfig.connectString,
-    },
-    function (err, conn) {
-      if (err) {
-        console.log("접속 실패", err);
-        return;
+    });
+
+    let query = "INSERT INTO HR(id, name, hr_group_id) VALUES(:id,:name,:hr_group_id)";
+    let data = [Number(req.body.id), req.body.name, Number(req.body.hr_group_id)];
+    await connection.execute(query, data);
+
+    connection.commit();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
       }
-      console.log("접속 성공");
-
-      conn.execute(
-        "select * from employee",
-        {},
-        { outFormat: db.OUT_FORMAT_OBJECT },
-        function (err, result) {
-          if (err) throw err;
-
-          console.log("query read success");
-
-          var dataStr = JSON.stringify(result);
-          arrStr = JSON.stringify(result.rows);
-          var arr = JSON.parse(arrStr);
-          res.send(arr);
-        }
-      );
     }
-  );
-});
+  }
+}
 
 module.exports = router;
