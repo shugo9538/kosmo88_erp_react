@@ -1,10 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
+import HRCode from "./HRCode";
+import AttendanceCD from "./AttendanceCD";
 import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter, Route } from "react-router-dom";
 
-ReactDOM.render(<App />, document.getElementById("insertAttendanceForm"));
+ReactDOM.render(
+  <BrowserRouter>
+    <Route path="/insertAttendanceCD" component={AttendanceCD} />
+    <Route path="/insertHRCode" component={HRCode} />
+  </BrowserRouter>,
+  document.getElementById("insertAttendanceForm")
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
