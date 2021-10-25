@@ -3,7 +3,7 @@ import React, { Component, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./extraRes/assets/css/style.css";
 import "./extraRes/assets/css/icons.css";
-import { Link } from 'react-router'
+import { Link } from "react-router";
 
 // html 선언
 class Item extends Component {
@@ -85,6 +85,7 @@ class CustomTable extends Component {
     this.deleteItem = this.deleteItem.bind(this);
     this.callAPI = this.callAPI.bind(this.callAPI);
     this.onChange = this.onChange.bind(this.onChange);
+    this.onClose = this.onClose.bind(this.onClose);
     // this.addItem();
   }
 
@@ -146,7 +147,15 @@ class CustomTable extends Component {
     })
       .then((res) => res.json())
       .then((json) => console.log(json));
+
+      this.onClose();
   };
+
+  onClose() {
+    window.opener = null;
+    window.open("", "_self");
+    window.close();
+  }
 
   render() {
     return (

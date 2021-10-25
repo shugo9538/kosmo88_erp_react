@@ -3,15 +3,14 @@ import React, { Component, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./extraRes/assets/css/style.css";
 import "./extraRes/assets/css/icons.css";
-import { Link } from 'react-router'
 
 // html 선언
 class Item extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: "",
       name: "",
-      type: "",
     };
     this.onChange = this.onChange.bind(this);
   }
@@ -25,11 +24,37 @@ class Item extends Component {
   };
 
   render() {
+    const id = this.state.id;
     const name = this.state.name;
-    const type = this.state.hr_group_id;
 
     return (
       <tr id={this.props.index}>
+        
+        {/* <td>
+          <select 
+            className="form-control"
+            name="id"
+            type="number"
+            onChange={this.onChange}>
+            <option value="100" selected={true}>인사</option>
+            <option value="200">근태</option>
+            <option value="300">급여</option>
+            <option value="400">기타</option>
+            <option value="500">시스템설정</option>
+            <option value="600">전체</option>
+          </select>   
+        </td>  */}
+
+        <td>
+          <input
+            className="form-control"
+            name="id"
+            type="number"
+            value={id}
+            onChange={this.onChange}
+          />
+        </td> 
+
         <td>
           <input
             className="form-control"
@@ -39,27 +64,18 @@ class Item extends Component {
             onChange={this.onChange}
           />
         </td>
-        <td>
-          <input
-            className="form-control"
-            name="type"
-            type="number"
-            value={type}
-            onChange={this.onChange}
-          />
-        </td>
       </tr>
     );
   }
 }
 
-class CustomTable extends Component {
+class HRCodeGroupTable extends Component {
   constructor(props) {
     super(props);
     this.numChildren = Number(0);
     this.state = {
+      id: "",
       name: "",
-      type: "",
     };
     this.callAPI = this.callAPI.bind(this.callAPI);
     this.onChange = this.onChange.bind(this.onChange);
@@ -73,42 +89,51 @@ class CustomTable extends Component {
     console.log(this.state);
   };
 
+  deleteItem = (position) => {
+    console.log(position);
+    var tmp = this.list.filter((item) => position != item.index);
+    console.log(tmp);
+    this.list = tmp;
+  };
+
+  onClose() {
+    window.opener = null;
+    window.open("", "_self");
+    window.close();
+  }
+
   // db접근 함수
   callAPI = () => {
     console.log(
       JSON.stringify({
+        id: this.state.id,
         name: this.state.name,
-        type: this.state.type,
       })
     );
-    fetch("http://192.168.25.6:3002/insertATTCD", {
+    fetch("http://localhost:3002/insertHRGroupCode", {
       method: "POST",
       mode: "cors",
       headers: {
         "content-type": "application/json; charset=UTF-8",
       },
       body: JSON.stringify({
+        id: this.state.id,
         name: this.state.name,
-        type: this.state.type,
       }),
     })
       .then((res) => res.json())
       .then((json) => console.log(json));
       this.onClose();
   };
-  onClose() {
-    window.opener = null;
-    window.open("", "_self");
-    window.close();
-  }
+
   render() {
     return (
       <div>
         <table id="insertAttendanceTable" className="table table-hover">
           <thead>
             <tr>
-              <th>근태 명칭</th>
-              <th>근태 유형</th>
+              <th>인사코드 그룹</th>
+              <th>인사코드 그룹명</th>
             </tr>
           </thead>
           <tbody id="attendance-group">
@@ -116,12 +141,16 @@ class CustomTable extends Component {
               key={0}
               index={0}
               onTransferChange={this.onChange}
+              deleteBtn={this.deleteItem}
             />
           </tbody>
         </table>
+        {
+       
+        }
         <div className="table-responsive" align="center">
           <div style={{ textAlign: "center" }}>
-            <button id="insertAttCDAction" onClick={this.callAPI}>
+            <button id="insertAttendanceAction" onClick={this.callAPI}>
               등록
             </button>
             <input type="reset" value="취소" />
@@ -135,6 +164,6 @@ class CustomTable extends Component {
 export default class App extends Component {
   // 위에서 함수 Insert()를 뷰 상태 그대로 렌더링
   render() {
-    return <CustomTable />;
+    return <HRCodeGroupTable />;
   }
 }
