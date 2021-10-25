@@ -3,13 +3,19 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import HRCode from "./HRCode";
 import AttendanceCD from "./AttendanceCD";
+import Position from "./Position";
+import Department from "./Deptartment";
+import HRGroup from "./HRGroup";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Route } from "react-router-dom";
 
 ReactDOM.render(
   <BrowserRouter>
     <Route path="/insertAttendanceCD" component={AttendanceCD} />
+    <Route path="/insertHRGroup" component={HRGroup} />
     <Route path="/insertHRCode" component={HRCode} />
+    <Route path="/insertPosition" component={Position} />
+    <Route path="/insertDept" component={Department} />
   </BrowserRouter>,
   document.getElementById("insertAttendanceForm")
 );

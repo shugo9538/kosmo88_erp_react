@@ -3,15 +3,15 @@ import React, { Component, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./extraRes/assets/css/style.css";
 import "./extraRes/assets/css/icons.css";
-import { Link } from 'react-router'
 
 // html 선언
 class Item extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: "",
       name: "",
-      type: "",
+      annual_income: "",
     };
     this.onChange = this.onChange.bind(this);
   }
@@ -25,11 +25,21 @@ class Item extends Component {
   };
 
   render() {
+    const id = this.state.id;
     const name = this.state.name;
-    const type = this.state.hr_group_id;
+    const annual_income = this.state.annual_income;
 
     return (
       <tr id={this.props.index}>
+        <td>
+          <input
+            className="form-control"
+            name="id"
+            type="number"
+            value={id}
+            onChange={this.onChange}
+          />
+        </td>
         <td>
           <input
             className="form-control"
@@ -42,9 +52,9 @@ class Item extends Component {
         <td>
           <input
             className="form-control"
-            name="type"
+            name="annual_income"
             type="number"
-            value={type}
+            value={annual_income}
             onChange={this.onChange}
           />
         </td>
@@ -53,17 +63,21 @@ class Item extends Component {
   }
 }
 
-class CustomTable extends Component {
+class PositionTable extends Component {
   constructor(props) {
     super(props);
     this.numChildren = Number(0);
     this.state = {
+      id: "",
       name: "",
-      type: "",
+      annual_income: "",
     };
+    // this.addItem = this.addItem.bind(this);
+    // this.deleteItem = this.deleteItem.bind(this);
     this.callAPI = this.callAPI.bind(this.callAPI);
     this.onChange = this.onChange.bind(this.onChange);
     this.onClose = this.onClose.bind(this.onClose);
+    // this.addItem();
   }
 
   onChange = (e) => {
@@ -71,44 +85,55 @@ class CustomTable extends Component {
       [e.target.name]: e.target.value,
     });
     console.log(this.state);
+    
   };
 
-  // db접근 함수
-  callAPI = () => {
-    console.log(
-      JSON.stringify({
-        name: this.state.name,
-        type: this.state.type,
-      })
-    );
-    fetch("http://192.168.25.6:3002/insertATTCD", {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        "content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify({
-        name: this.state.name,
-        type: this.state.type,
-      }),
-    })
-      .then((res) => res.json())
-      .then((json) => console.log(json));
-      this.onClose();
+  deleteItem = (position) => {
+    console.log(position);
+    var tmp = this.list.filter((item) => position != item.index);
+    console.log(tmp);
+    this.list = tmp;
   };
   onClose() {
     window.opener = null;
     window.open("", "_self");
     window.close();
   }
+  // db접근 함수
+  callAPI = () => {
+    console.log(
+      JSON.stringify({
+        id: this.state.id,
+        name: this.state.name,
+        annual_income: this.state.annual_income,
+      })
+    );
+    fetch("http://localhost:3002/insertPositionCode", {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "content-type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({
+        id: this.state.id,
+        name: this.state.name,
+        annual_income: this.state.annual_income,
+      }),
+    })
+      .then((res) => res.json())
+      .then((json) => console.log(json));
+      this.onClose();
+  };
+
   render() {
     return (
       <div>
         <table id="insertAttendanceTable" className="table table-hover">
           <thead>
             <tr>
-              <th>근태 명칭</th>
-              <th>근태 유형</th>
+              <th>직급 코드</th>
+              <th>직급 코드명</th>
+              <th>직급별 연봉</th>
             </tr>
           </thead>
           <tbody id="attendance-group">
@@ -116,12 +141,23 @@ class CustomTable extends Component {
               key={0}
               index={0}
               onTransferChange={this.onChange}
+              deleteBtn={this.deleteItem}
             />
           </tbody>
         </table>
+        {
+          // <div
+          //   role="button"
+          //   className="preview col-md-12 md-5"
+          //   id="addAttendance"
+          //   onClick={this.addItem}
+          // >
+          //   <i className="icon-plus">항목 추가</i>
+          // </div>
+        }
         <div className="table-responsive" align="center">
           <div style={{ textAlign: "center" }}>
-            <button id="insertAttCDAction" onClick={this.callAPI}>
+            <button id="insertAttendanceAction" onClick={this.callAPI}>
               등록
             </button>
             <input type="reset" value="취소" />
@@ -135,6 +171,6 @@ class CustomTable extends Component {
 export default class App extends Component {
   // 위에서 함수 Insert()를 뷰 상태 그대로 렌더링
   render() {
-    return <CustomTable />;
+    return <PositionTable />;
   }
 }
